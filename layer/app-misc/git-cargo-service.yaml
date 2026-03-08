@@ -1,0 +1,58 @@
+# METABEGIN
+# X-Env-Layer-Name: git-cargo-service
+# X-Env-Layer-Category: example
+# X-Env-Layer-Desc: Build a Rust project on the host and install the binary
+#  into the image with a systemd service.
+# X-Env-Layer-Version: 1.0.0
+# X-Env-Layer-Requires: systemd-min,sys-build-base
+#
+# X-Env-VarPrefix: app
+#
+# X-Env-Var-repo_url: https://example.com/your/repo.git
+# X-Env-Var-repo_url-Desc: Git URL to clone on the host during build.
+# X-Env-Var-repo_url-Required: y
+# X-Env-Var-repo_url-Valid: string
+# X-Env-Var-repo_url-Set: y
+#
+# X-Env-Var-project_name: myapp
+# X-Env-Var-project_name-Desc: Directory name of the repo (also binary name).
+# X-Env-Var-project_name-Required: y
+# X-Env-Var-project_name-Valid: regex:^[A-Za-z0-9._-]+$
+# X-Env-Var-project_name-Set: y
+# METAEND
+---
+mmdebstrap:
+  customize-hooks:
+    - |-
+      set -euo pipefail
+      command -v git >/dev/null 2>&1 || { echo "git not found on host"; exit 1; }
+      command -v cargo >/dev/null 2>&1 || { echo "cargo not found on host (install via rustup)"; exit 1; }
+      command -v rustup >/dev/null 2>&1 || { echo "rustup not found on host"; exit 1; }
+      command -v envsubst >/dev/null 2>&1 || { echo "envsubst not found on host"; exit 1; }
+
+      repo_url="$IGconf_app_repo_url"
+      project="$IGconf_app_project_name"
+
+      build_root="${IGconf_sys_buildroot:?missing IGconf_sys_buildroot}"
+      src_root="${build_root}/git-src"
+      workdir="${src_root}/${project}"
+
+      mkdir -p "$src_root"
+      if [ -d "$workdir" ]; then
+        rm -rf "$workdir"
+      fi
+      git clone "$repo_url" "$workdir"
+      cd "$workdir"
+      cargo build --release
+
+      install_root="$1/opt/$project"
+      install -d "$install_root"
+      install -m 0755 "target/release/$project" "$install_root/$project"
+
+      install -d "$1/etc/systemd/system"
+      export APP_NAME="$project"
+      export APP_BIN="/opt/$project/$project"
+      export APP_WORKDIR="/opt/$project"
+      envsubst < "$IGTOP/layer/app-misc/git-cargo-service.service.tpl" \
+        > "$1/etc/systemd/system/${project}.service"
+    - $BDEBSTRAP_HOOKS/enable-units "$1" "$IGconf_app_project_name"

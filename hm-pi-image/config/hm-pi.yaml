@@ -1,0 +1,16 @@
+include:
+  file: trixie-minbase-ab.yaml
+
+image:
+  system_part_size: 2000M # Cage + wayland + chromium + deps
+  name: hm-pi-image
+
+layer:
+  app: hm-pi
+  extra: rpi-splash-screen
+
+splash:
+  image_path: ${@SRCROOT}/splash.tga
+
+kiosk:
+  url: "https://raspberrypi.com"

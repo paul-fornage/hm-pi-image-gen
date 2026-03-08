@@ -1,0 +1,12 @@
+include:
+  file: bookworm-minbase.yaml
+
+image:
+  name: rust-service
+
+layer:
+  app: git-cargo-service
+
+app:
+  repo_url: "https://example.com/your/repo.git"
+  project_name: "your-repo"
