@@ -12,7 +12,7 @@
 # X-Env-Var-url: https://example.com
 # X-Env-Var-url-Desc: Default URL the web kiosk will load at startup.
 # X-Env-Var-url-Required: n
-# X-Env-Var-url-Valid: regex:^https://[a-zA-Z0-9.-]+[a-zA-Z0-9]/?.*$
+# X-Env-Var-url-Valid: regex:^http[s]?://[a-zA-Z0-9.-]+[a-zA-Z0-9]/?.*$
 # X-Env-Var-url-Set: y
 # METAEND
 ---
