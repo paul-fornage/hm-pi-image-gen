@@ -15,7 +15,7 @@
 # X-Env-Var-repo_url-Set: y
 #
 # X-Env-Var-project_name: myapp
-# X-Env-Var-project_name-Desc: Directory name of the repo (also default binary name).
+# X-Env-Var-project_name-Desc: Directory name of the repo
 # X-Env-Var-project_name-Required: y
 # X-Env-Var-project_name-Valid: regex:^[A-Za-z0-9._-]+$
 # X-Env-Var-project_name-Set: y
@@ -36,7 +36,8 @@
 mmdebstrap:
   customize-hooks:
     - |-
-      set -euo pipefail
+      bash -o pipefail -c '
+      set -eu
       command -v git >/dev/null 2>&1 || { echo "git not found on host"; exit 1; }
       command -v cargo >/dev/null 2>&1 || { echo "cargo not found on host (install via rustup)"; exit 1; }
       command -v rustup >/dev/null 2>&1 || { echo "rustup not found on host"; exit 1; }
@@ -69,4 +70,5 @@ mmdebstrap:
       export APP_WORKDIR="/opt/$project"
       envsubst < "$IGconf_server_service_tpl" \
         > "$1/etc/systemd/system/${project}.service"
+      ' bash "$1"
     - $BDEBSTRAP_HOOKS/enable-units "$1" "$IGconf_server_project_name"

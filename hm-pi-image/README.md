@@ -15,3 +15,9 @@ Usage of `-S` allows rpi-image-gen to locate the config file automatically becau
 ```bash
 rpi-image-gen build -S ./examples/webkiosk/ -c kiosk.yaml
 ```
+
+- 1.17/3.15
+- add user/pass
+- ssh setup?
+- maybe "The kiosk service sets XDG_RUNTIME_DIR to /home/$USER, which is wrong for Wayland and will prevent Cage/Chromium from starting at boot.
+  You export KIOSK_RUNDIR=/home/$IGconf_device_user1 and inject it into XDG_RUNTIME_DIR. For a system service running Wayland, XDG_RUNTIME_DIR must be a runtime dir (usually /run/user/<uid>). With the current value, Cage/Chromium will fail even if installed."

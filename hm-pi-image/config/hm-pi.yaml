@@ -11,7 +11,12 @@ layer:
   server: hm-pi-server
 
 splash:
-  image_path: ${@SRCROOT}/splash.tga
+  image_path: ${@SRCROOT}/mitusa-splash.tga
+  # Skip image validation checks (not recommended for production)
+  skip_image_checks: n
+
+  # Automatically update /boot/firmware/cmdline.txt to enable splash
+  update_cmdline: y
 
 kiosk:
   url: "http://127.0.0.1:3000/"
@@ -19,4 +24,4 @@ kiosk:
 server:
   repo_url: "https://example.com/your/repo.git"
   project_name: "your-repo"
-  # binary_name: "your-binary"
+  binary_name: "your-binary"
