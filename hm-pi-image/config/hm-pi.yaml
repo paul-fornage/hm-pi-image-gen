@@ -5,6 +5,11 @@ image:
   system_part_size: 2000M # Cage + wayland + chromium + deps
   name: hm-pi-image
 
+device:
+  hostname: mitusa-hm-pi
+  user1: mitusa
+  user1pass: a1A!b2B@
+
 layer:
   app: hm-pi
   extra: rpi-splash-screen
@@ -22,6 +27,6 @@ kiosk:
   url: "http://127.0.0.1:3000/"
 
 server:
-  repo_url: "https://example.com/your/repo.git"
-  project_name: "your-repo"
-  binary_name: "your-binary"
+  repo_url: "https://github.com/paul-fornage/hm-pi-htmx.git"
+  project_name: "hm-pi-htmx"
+  binary_name: "hm-pi-htmx"

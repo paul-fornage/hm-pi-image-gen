@@ -13,7 +13,7 @@ To deploy a production kiosk system it is envisaged that a specific config file 
 Usage of `-S` allows rpi-image-gen to locate the config file automatically because the source directory (`./examples/webkiosk/`) is prioritised in the search path.
 
 ```bash
-rpi-image-gen build -S ./examples/webkiosk/ -c kiosk.yaml
+./rpi-image-gen build -S ./hm-pi-image/ -c hm-pi.yaml
 ```
 
 - 1.17/3.15
