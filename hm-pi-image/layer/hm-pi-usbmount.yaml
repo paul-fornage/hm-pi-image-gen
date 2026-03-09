@@ -1,0 +1,22 @@
+# METABEGIN
+# X-Env-Layer-Name: hm-pi-usbmount
+# X-Env-Layer-Category: hm-pi
+# X-Env-Layer-Desc: Auto-mount USB storage using usbmount and systemd drop-ins.
+# X-Env-Layer-Version: 1.0.0
+# X-Env-Layer-Requires: systemd-min
+# METAEND
+---
+mmdebstrap:
+  packages:
+    - udev
+    - systemd
+    - exfatprogs
+  customize-hooks:
+    - |-
+      set -eu
+      install -d -m 0755 "$1/etc/udev/rules.d"
+      cat > "$1/etc/udev/rules.d/99-usb-automount.rules" <<-'EOF'
+      # Mount USB devices to /media/usb-<device-name> (e.g., /media/usb-sda1)
+      ACTION=="add", SUBSYSTEMS=="usb", SUBSYSTEM=="block", ENV{ID_FS_USAGE}=="filesystem", RUN+="/usr/bin/systemd-mount --no-block --collect --options=sync,nodev,noexec,noatime /dev/%k /media/usb-%k"
+      ACTION=="remove", SUBSYSTEMS=="usb", SUBSYSTEM=="block", ENV{ID_FS_USAGE}=="filesystem", RUN+="/usr/bin/systemd-mount --umount /media/usb-%k"
+      EOF

@@ -62,7 +62,13 @@ mmdebstrap:
 
       install_root="$1/opt/$project"
       install -d "$install_root"
-      install -m 0755 "target/release/$binary" "$install_root/$binary"
+      
+      # Copy all project files (including css/html) to the target
+      cp -a "$workdir/." "$install_root/"
+      # Remove unnecessary build artifacts from the final image
+      rm -rf "$install_root/.git" "$install_root/target"
+      # Install the compiled binary
+      install -m 0755 "$workdir/target/release/$binary" "$install_root/$binary"
 
       install -d "$1/etc/systemd/system"
       export APP_NAME="$project"

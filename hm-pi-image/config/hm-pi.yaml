@@ -14,6 +14,7 @@ layer:
   app: hm-pi
   extra: rpi-splash-screen
   server: hm-pi-server
+  usbmount: hm-pi-usbmount
 
 splash:
   image_path: ${@SRCROOT}/mitusa-splash.tga
