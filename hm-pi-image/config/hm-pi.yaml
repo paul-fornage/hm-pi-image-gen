@@ -8,9 +8,15 @@ image:
 layer:
   app: hm-pi
   extra: rpi-splash-screen
+  server: hm-pi-server
 
 splash:
   image_path: ${@SRCROOT}/splash.tga
 
 kiosk:
-  url: "https://raspberrypi.com"
+  url: "http://127.0.0.1:3000/"
+
+server:
+  repo_url: "https://example.com/your/repo.git"
+  project_name: "your-repo"
+  # binary_name: "your-binary"

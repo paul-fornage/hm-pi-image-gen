@@ -1,12 +1,12 @@
 # METABEGIN
-# X-Env-Layer-Name: git-cargo-service
-# X-Env-Layer-Category: example
+# X-Env-Layer-Name: hm-pi-server
+# X-Env-Layer-Category: app
 # X-Env-Layer-Desc: Build a Rust project on the host and install the binary
 #  into the image with a systemd service.
 # X-Env-Layer-Version: 1.0.0
 # X-Env-Layer-Requires: systemd-min,sys-build-base
 #
-# X-Env-VarPrefix: app
+# X-Env-VarPrefix: server
 #
 # X-Env-Var-repo_url: https://example.com/your/repo.git
 # X-Env-Var-repo_url-Desc: Git URL to clone on the host during build.
@@ -15,10 +15,22 @@
 # X-Env-Var-repo_url-Set: y
 #
 # X-Env-Var-project_name: myapp
-# X-Env-Var-project_name-Desc: Directory name of the repo (also binary name).
+# X-Env-Var-project_name-Desc: Directory name of the repo (also default binary name).
 # X-Env-Var-project_name-Required: y
 # X-Env-Var-project_name-Valid: regex:^[A-Za-z0-9._-]+$
 # X-Env-Var-project_name-Set: y
+#
+# X-Env-Var-binary_name: ${project_name}
+# X-Env-Var-binary_name-Desc: Binary name produced by cargo build.
+# X-Env-Var-binary_name-Required: y
+# X-Env-Var-binary_name-Valid: regex:^[A-Za-z0-9._-]+$
+# X-Env-Var-binary_name-Set: y
+#
+# X-Env-Var-service_tpl: ${DIRECTORY}/../server.service.tpl
+# X-Env-Var-service_tpl-Desc: Path to the systemd service template.
+# X-Env-Var-service_tpl-Required: y
+# X-Env-Var-service_tpl-Valid: string
+# X-Env-Var-service_tpl-Set: y
 # METAEND
 ---
 mmdebstrap:
@@ -28,10 +40,12 @@ mmdebstrap:
       command -v git >/dev/null 2>&1 || { echo "git not found on host"; exit 1; }
       command -v cargo >/dev/null 2>&1 || { echo "cargo not found on host (install via rustup)"; exit 1; }
       command -v rustup >/dev/null 2>&1 || { echo "rustup not found on host"; exit 1; }
+      rustup show active-toolchain >/dev/null 2>&1 || { echo "rustup has no active toolchain"; exit 1; }
       command -v envsubst >/dev/null 2>&1 || { echo "envsubst not found on host"; exit 1; }
 
-      repo_url="$IGconf_app_repo_url"
-      project="$IGconf_app_project_name"
+      repo_url="$IGconf_server_repo_url"
+      project="$IGconf_server_project_name"
+      binary="$IGconf_server_binary_name"
 
       build_root="${IGconf_sys_buildroot:?missing IGconf_sys_buildroot}"
       src_root="${build_root}/git-src"
@@ -47,12 +61,12 @@ mmdebstrap:
 
       install_root="$1/opt/$project"
       install -d "$install_root"
-      install -m 0755 "target/release/$project" "$install_root/$project"
+      install -m 0755 "target/release/$binary" "$install_root/$binary"
 
       install -d "$1/etc/systemd/system"
       export APP_NAME="$project"
-      export APP_BIN="/opt/$project/$project"
+      export APP_BIN="/opt/$project/$binary"
       export APP_WORKDIR="/opt/$project"
-      envsubst < "$IGTOP/layer/app-misc/git-cargo-service.service.tpl" \
+      envsubst < "$IGconf_server_service_tpl" \
         > "$1/etc/systemd/system/${project}.service"
-    - $BDEBSTRAP_HOOKS/enable-units "$1" "$IGconf_app_project_name"
+    - $BDEBSTRAP_HOOKS/enable-units "$1" "$IGconf_server_project_name"
